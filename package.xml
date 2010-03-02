@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.6.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+ <name>fcDbBackupPlugin</name>
+ <channel>pear.symfony-project.com</channel>
+ <summary>This plugin adds a CLI task that performs automatic snapshots of your DB, and provides archiving capabilities.</summary>
+ <description>This plugin adds a CLI task that performs as many snapshots as you like, stores them in a configurable directory with a clear and readable naming structure, and offers auto-archiving capabilities inspired by Apple&apos;s Time Machine.</description>
+ <lead>
+  <name>Cedric Sadai</name>
+  <user>sadai</user>
+  <email>cedric@seedweb-agency.com</email>
+  <active>yes</active>
+ </lead>
+ <date>2010-02-04</date>
+ <time>09:43:15</time>
+ <version>
+  <release>0.1.0</release>
+  <api>1.1.0</api>
+ </version>
+ <stability>
+  <release>beta</release>
+  <api>beta</api>
+ </stability>
+ <license uri="http://www.symfony-project.org/license">MIT license</license>
+ <notes>-</notes>
+ <contents>
+  <dir name="/">
+   <file name="README" role="data" />
+   <file name="LICENSE" role="data" />
+	<dir name="lib">
+		<dir name="task">
+			 <file name="fcDbBackupTask.class.php" role="data" />
+		</dir>
+	</dir>
+  </dir>
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>5.1.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.1</min>
+   </pearinstaller>
+   <package>
+    <name>symfony</name>
+    <channel>pear.symfony-project.com</channel>
+    <min>1.1.0</min>
+    <max>2.0.0</max>
+    <exclude>2.0.0</exclude>
+   </package>
+  </required>
+ </dependencies>
+ <phprelease />
+ <changelog>
+  <release>
+   <version>
+    <release>0.1.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <license uri="http://www.symfony-project.com/license">MIT license</license>
+   <license>MIT</license>
+   <date>2010-02-04</date>
+   <notes>* Initial public release. Features automatic backups with extremely easy configuration. Auto cleaning of old files, keeping the most up-to-date of old archives.</notes>
+  </release>
+ </changelog>
+</package>

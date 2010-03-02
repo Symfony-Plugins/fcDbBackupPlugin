@@ -1,0 +1,80 @@
+# fcDbBackup plugin (for symfony 1.*) #
+
+The fcDbBackupPlugin adds a CLI task that performs as many snapshots as you like, stores them in a configurable directory with a clear and readable naming structure, and offers auto-archiving capabilities inspired by Apple Time Machine.
+
+## Installation ##
+
+  * Install the plugin (via a package)
+
+        symfony plugin:install fcDbBackupPlugin
+
+  * Clear you cache (version prior to 1.3)
+
+        symfony cc
+
+  * Configure the path you want to store your backups in, and the path to your RDBMS executables (latter is optional)
+
+        all:
+          fcDbBackupPlugin:
+            path: /your/backup/path/
+            pathToExec: /Applications/MAMP/Library/bin/ # path to your RDBMS executable files (optional)
+            
+    **Note**: You can put or omit the ending slash, as the task is smart enough to deal with or without it. Also, it should also work with Windows-based paths.
+
+
+## Usage ##
+
+Making a backup is as simple as calling the following task:
+
+        symfony fc:dbBackup
+        
+
+  * This plugin is ORM-agnostic, so it works both for Propel or Doctrine
+
+  * You can perform as many snapshot per day as you like. Each file name will be automatically incremented with their version.
+
+  * At runtime, the cleaning feature is called. It preserves all backups from the current and the previous month. Before that:
+    * the task automatically keeps the **most recent weekly backups** from all the backups created two months ago
+    * only keeps the **most recent backup** from the backups saved three months ago.
+    
+  * By default, the current active database will be saved. You need to have a database configured in the file "database.yml" for the backup utility to work.
+
+
+_Warning_: For the moment, only MySQL is supported. PgSql is coded but has not been tested, other RDBMS to come soon.
+
+### Call from outside ###
+
+
+If you want to call it from an outside task, just call it that way:
+
+
+
+        <?php
+        //-- Backup of the database
+        $dbsafe = new fcDbBackupTask($this->dispatcher, $this->formatter);
+        $dbsafe->run(array(), array());
+
+
+### Automated backups ###
+
+
+It is recommended to make this backup a running task, using the crontab utility on Linux for instance. 
+
+        (after typing "crontab -e")
+        50 * * * *  /path/to/php/php /path/to/symfony/project/symfony fc:dbBackup > /www/apache/logs/error_log
+  
+  
+
+In this case the task will launched every hour, at *:50.
+        
+        
+### Todo ###
+
+  * Make it compatible with more RDBMS
+  
+  * Automatic syncing with distant storage systems (like Amazon S3)
+  
+  
+## Side Note ##
+
+Both the name of the plugin and its logo refer to [FatCap](http://www.fatcap.com/ "FatCap"), the website for which it was originally developed.
