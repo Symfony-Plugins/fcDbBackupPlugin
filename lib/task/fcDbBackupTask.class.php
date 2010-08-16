@@ -87,7 +87,8 @@ EOF;
             $parts['host'], 
             $parts['user'], 
             $parts['pass'], 
-            $parts['path']
+            $parts['path'],
+            $parts['socket']
         );
         
         //-- Creating the snapshot
@@ -133,8 +134,11 @@ EOF;
             
             foreach (explode(';', $dsnParts[1]) as $val)
             {
-                $miniParts = explode('=', $val);
-                $decryptDsn[$miniParts[0]] = $miniParts[1];
+                if ($val) // account for possibility of someone ending the string with ;
+                {
+                  $miniParts = explode('=', $val);
+                  $decryptDsn[$miniParts[0]] = $miniParts[1];
+                }
             }
             
             if ($dsnParts[0] == 'uri') 
@@ -147,7 +151,8 @@ EOF;
                 'pass'   => (isset($dsn[2])) ? $dsn[2] : null,
                 'scheme' => $dsnParts[0],
                 'host'   => $decryptDsn['host'],
-                'path'   => $decryptDsn['dbname']
+                'path'   => $decryptDsn['dbname'],
+                'socket' => (isset($decryptDsn['unix_socket'])) ? $decryptDsn['unix_socket'] : null,
             );
         }
         else
@@ -156,7 +161,7 @@ EOF;
         }
         
         //-- cleaning starting slash for path (see parse_url behaviour)
-        if (ereg('^\/', $parts['path']))
+        if (preg_match('#^\/#', $parts['path']))
         {
             $parts['path'] = substr($parts['path'], 1);
         }
@@ -281,7 +286,7 @@ EOF;
      *
      *
      */
-    protected function getDumpCommand($driver = null, $host = null, $user = null, $pass = null, $dbname = null)
+    protected function getDumpCommand($driver = null, $host = null, $user = null, $pass = null, $dbname = null, $socket = null)
     {
         if ($driver === null || $host === null || $dbname === null || $user === null)
         {
@@ -293,11 +298,12 @@ EOF;
         {
             case 'mysql':
                 
-                return sprintf('%smysqldump -h %s -u %s -p%s %s > %s',
+                return sprintf('%smysqldump --hex-blob -h %s -u %s -p%s -S%s %s > %s',
                     $this->pathToExecutable,
                     $host,
                     $user,
                     $pass,
+                    null === $socket ? '/tmp/mysql.sock' : $socket,
                     $dbname,
                     $this->getCurrentFilename()
                 );
@@ -307,10 +313,11 @@ EOF;
             
             case 'pgsql':
             
-                return sprintf('%spg_dump -h %s -u %s %s > %s',
+                return sprintf('%spg_dump -h %s -u %s %s %s > %s',
                     $this->pathToExecutable,
                     $host,
                     $user,
+                    null === $socket ? '' : '-k '.$socket,
                     $dbname,
                     $this->getCurrentFilename()
                 );
@@ -332,7 +339,7 @@ EOF;
     {
         //-- Path to store the snapshot
         $path       = sfConfig::get('app_fcDbBackupPlugin_path', null);
-        $validPath  = ($path === null) ? null : (eregi('(\/|\\\)$', $path) ? substr($path, 0, -1) : $path);
+        $validPath  = ($path === null) ? null : (preg_match('#(\/|\\\)$#i', $path) ? substr($path, 0, -1) : $path);
         
         //-- Path to RDBMS executable
         $pathToExec             = sfConfig::get('app_fcDbBackupPlugin_pathToExec', '');
